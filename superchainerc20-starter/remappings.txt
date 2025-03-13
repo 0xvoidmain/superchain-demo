@@ -1,0 +1,3 @@
+@interop-lib/=lib/interop-lib/src/
+@solady/=lib/solady/src/
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/

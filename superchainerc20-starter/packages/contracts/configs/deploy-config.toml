@@ -1,0 +1,15 @@
+[deploy_config]
+salt = "ethers phoenix"
+chains = ["op_chain_a","op_chain_b"]
+
+[tokenA]
+owner_address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+name = "TestSuperERC20-A"
+symbol = "TS-A"
+decimals = 18
+
+[tokenB]
+owner_address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+name = "TestSuperERC20-B"
+symbol = "TS-B"
+decimals = 18
