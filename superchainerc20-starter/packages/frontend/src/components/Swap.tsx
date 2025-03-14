@@ -70,18 +70,6 @@ export const Swap = () => {
     ],
   })
 
-  console.log({
-    abi: SuperPoolAbi,
-    address: envVars.VITE_POOL_CONTRACT_ADDRESS,
-    functionName: 'swap',
-    args: [
-      fromToken,
-      amountUnits,
-      toToken,
-    ],
-    chainId: sourceChainId,
-  })
-
   const simulationResult = useSimulateContract({
     abi: SuperPoolAbi,
     address: envVars.VITE_POOL_CONTRACT_ADDRESS,
@@ -100,7 +88,7 @@ export const Swap = () => {
     functionName: 'approve',
     args: [
       envVars.VITE_POOL_CONTRACT_ADDRESS,
-      parseUnits('9999999', decimals)
+      parseUnits('9999999999', decimals)
     ],
     chainId: sourceChainId,
   })
