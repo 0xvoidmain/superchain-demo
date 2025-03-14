@@ -95,8 +95,6 @@ export const Swap = () => {
     chainId: sourceChainId,
   })
 
-  console.log('simulationCrossSwapResult', simulationCrossSwapResult)
-
   const simulationApproveResult = useSimulateContract({
     abi: L2NativeSuperchainERC20Abi,
     address: fromToken,
@@ -260,8 +258,7 @@ export const Swap = () => {
             size="lg"
             disabled={isButtonDisabled}
             onClick={() => {
-              // targetChainId == sourceChainId ? writeContract(simulationResult.data!.request) : writeContract(simulationCrossSwapResult.data!.request)
-              writeContract(simulationCrossSwapResult.data!.request)
+              targetChainId == sourceChainId ? writeContract(simulationResult.data!.request) : writeContract(simulationCrossSwapResult.data!.request)
             }}
           >
             {isSendPending || isReceiptLoading ? (

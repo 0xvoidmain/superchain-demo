@@ -79,9 +79,9 @@ export const TokenAggregateSupply = () => {
                         <div className="text-sm font-medium">
                           {chain.chainName}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        {/* <div className="text-xs text-muted-foreground">
                           {percentage.toFixed(1)}% of total
-                        </div>
+                        </div> */}
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-medium">
@@ -94,12 +94,12 @@ export const TokenAggregateSupply = () => {
                     </div>
                   </div>
                 </div>
-                <div className="w-full bg-secondary rounded-full h-1.5">
+                {/* <div className="w-full bg-secondary rounded-full h-1.5">
                   <div
                     className="bg-primary rounded-full h-1.5 transition-all duration-500"
                     style={{ width: `${percentage}%` }}
                   />
-                </div>
+                </div> */}
               </div>
             )
           })}
@@ -125,9 +125,9 @@ export const TokenAggregateSupply = () => {
                         <div className="text-sm font-medium">
                           {chain.chainName}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        {/* <div className="text-xs text-muted-foreground">
                           {percentage.toFixed(1)}% of total
-                        </div>
+                        </div> */}
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-medium">
@@ -140,12 +140,12 @@ export const TokenAggregateSupply = () => {
                     </div>
                   </div>
                 </div>
-                <div className="w-full bg-secondary rounded-full h-1.5">
+                {/* <div className="w-full bg-secondary rounded-full h-1.5">
                   <div
                     className="bg-primary rounded-full h-1.5 transition-all duration-500"
                     style={{ width: `${percentage}%` }}
                   />
-                </div>
+                </div> */}
               </div>
             )
           })}

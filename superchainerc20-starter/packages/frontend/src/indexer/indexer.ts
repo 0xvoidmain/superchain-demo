@@ -1,6 +1,7 @@
 import { Address, createPublicClient, parseAbiItem } from 'viem'
 import { create } from 'zustand'
 import { parseJson, serializeJson } from '../lib/json'
+import { envVars } from '@/envVars'
 
 const CHUNK_SIZE = BigInt(1000)
 
@@ -268,7 +269,6 @@ export const createIndexer = (
         })
 
         logs2.forEach((log) => {
-          console.log('log', log)
           const transfer = {
             chainId,
             from: log.args.from as string,
@@ -281,6 +281,15 @@ export const createIndexer = (
           }
           useIndexerStore.getState().addTransfer(transfer)
         })
+
+        console.log(chainId, await client.getLogs({
+          address: envVars.VITE_POOL_CONTRACT_ADDRESS,
+          event: parseAbiItem(
+            'event ExecuteCrosschainSwap(uint256 sourceChainId, address tokenA, uint256 amountA, address tokenB, uint256 amountB, uint256 reserveA, uint256 reserveB, address recipient)',
+          ),
+          fromBlock: currentFromBlock,
+          toBlock: effectiveToBlock,
+        }))
 
         currentFromBlock = effectiveToBlock + BigInt(1)
       }
@@ -297,8 +306,6 @@ export const createIndexer = (
         const currentBlock = await client.getBlockNumber()
         const lastProcessedBlock =
           useIndexerStore.getState().lastProcessedBlocks[chainIdNum]
-
-        console.log('Initializing chain', chainIdNum, 'from block', lastProcessedBlock)
 
         if (!lastProcessedBlock) {
           await backfill(chainIdNum, BigInt(0), currentBlock)

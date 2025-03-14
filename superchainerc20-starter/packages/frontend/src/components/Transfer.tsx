@@ -98,11 +98,7 @@ export const Transfer = () => {
     hash,
   })
 
-  console.log(simulationResult.data, simulationTransferResult.data)
-
   const isLoading = isSendPending || isReceiptLoading || (!simulationResult.data?.request && !simulationTransferResult.data?.request)
-
-  console.log({isLoading, isSendPending, isReceiptLoading, s: !simulationResult.data?.request})
 
   const isButtonDisabled = !address || !amount || !recipient || isLoading
 
