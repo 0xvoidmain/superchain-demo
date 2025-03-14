@@ -1,3 +1,6 @@
 [submodule "lib/interop-lib"]
 	path = lib/interop-lib
 	url = https://github.com/ethereum-optimism/interop-lib
+[submodule "superchainerc20-starter/packages/contracts/lib/interop-lib"]
+	path = superchainerc20-starter/packages/contracts/lib/interop-lib
+	url = https://github.com/ethereum-optimism/interop-lib
