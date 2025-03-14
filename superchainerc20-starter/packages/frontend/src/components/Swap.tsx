@@ -41,7 +41,7 @@ export const Swap = () => {
   )
   const sourceChainId = parseInt(sourceChainIdString)
   const [targetChainIdString, setTargetChain] = useState(
-    chains[0].id.toString(),
+    chains[1].id.toString(),
   )
   const targetChainId = parseInt(targetChainIdString)
 
@@ -81,6 +81,21 @@ export const Swap = () => {
     ],
     chainId: sourceChainId,
   })
+
+  const simulationCrossSwapResult = useSimulateContract({
+    abi: SuperPoolAbi,
+    address: envVars.VITE_POOL_CONTRACT_ADDRESS,
+    functionName: 'crosschainSwap',
+    args: [
+      targetChainId,
+      fromToken,
+      amountUnits,
+      toToken,
+    ],
+    chainId: sourceChainId,
+  })
+
+  console.log('simulationCrossSwapResult', simulationCrossSwapResult)
 
   const simulationApproveResult = useSimulateContract({
     abi: L2NativeSuperchainERC20Abi,
@@ -126,7 +141,7 @@ export const Swap = () => {
   })
 
   const isLoading =
-    isSendPending || isReceiptLoading || !simulationResult.data?.request
+    isSendPending || isReceiptLoading || (!simulationResult.data?.request && !simulationCrossSwapResult.data?.request)
 
   const isButtonDisabled =
     !address || !amount || !sourceChain || !targetChain || isLoading
@@ -245,7 +260,8 @@ export const Swap = () => {
             size="lg"
             disabled={isButtonDisabled}
             onClick={() => {
-              writeContract(simulationResult.data!.request)
+              // targetChainId == sourceChainId ? writeContract(simulationResult.data!.request) : writeContract(simulationCrossSwapResult.data!.request)
+              writeContract(simulationCrossSwapResult.data!.request)
             }}
           >
             {isSendPending || isReceiptLoading ? (
@@ -253,7 +269,7 @@ export const Swap = () => {
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               </>
             ) : (
-              'Send'
+              'Swap'
             )}
           </Button>
         </div>

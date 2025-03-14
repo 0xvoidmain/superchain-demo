@@ -11,7 +11,7 @@ contract SuperPool {
     IL2ToL2CrossDomainMessenger public constant messenger =IL2ToL2CrossDomainMessenger(0x4200000000000000000000000000000000000023);
 
     event InitCrosschainSwap(uint256 targetChainId, address tokenA, uint256 amountA, address tokenB, address recipient);
-    event ExecutedCrosschainSwap(uint256 sourceChainId, address tokenA, uint256 amountA, address tokenB, address recipient);
+    event ExecuteCrosschainSwap(uint256 sourceChainId, address tokenA, uint256 amountA, address tokenB, address recipient);
 
     function getReserves(address tokenA, address tokenB) public view returns (uint256, uint256) {
         return (IERC20(tokenA).balanceOf(address(this)), IERC20(tokenB).balanceOf(address(this)));
@@ -46,10 +46,10 @@ contract SuperPool {
                 tokenB,
                 msg.sender
             )
-        )
+        );
     }
 
-    function executeCrosschainSwap(, bytes32 sendERC20MsgHash, address tokenA, uint256 amountA, address tokenB, address recipient) external {
+    function executeCrosschainSwap(bytes32 sendERC20MsgHash, address tokenA, uint256 amountA, address tokenB, address recipient) external {
         CrossDomainMessageLib.requireCrossDomainCallback();
         CrossDomainMessageLib.requireMessageSuccess(sendERC20MsgHash);
 
@@ -57,6 +57,6 @@ contract SuperPool {
         IERC20(tokenB).transfer(recipient, amountB);
 
         (, uint256 chainId) = messenger.crossDomainMessageContext();              
-        emit ExecutedCrosschainSwap(chainId, tokenA, amountA, tokenB, recipient);
+        emit ExecuteCrosschainSwap(chainId, tokenA, amountA, tokenB, recipient);
     }
 }
