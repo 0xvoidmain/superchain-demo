@@ -1,6 +1,6 @@
 [rpc_endpoints]
-op_chain_a = "http://127.0.0.1:9545"
-op_chain_b = "http://127.0.0.1:9546"
+op_chain_a = "https://interop-alpha-0.optimism.io"
+op_chain_b = "https://interop-alpha-1.optimism.io"
 
 [profile.default]
 src = "src"
