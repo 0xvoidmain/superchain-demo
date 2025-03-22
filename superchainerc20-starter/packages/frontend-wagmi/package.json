@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "shadcn:add": "pnpm dlx shadcn add",
     "init:env": "cp .env.example .env",
-    "typecheck": "tsc --build --noEmit"
+    "typecheck": "tsc --build --noEmit",
+    "build": "vite build"
   },
   "dependencies": {
     "@eth-optimism/viem": "^0.0.11",

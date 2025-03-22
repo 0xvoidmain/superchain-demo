@@ -1,8 +1,12 @@
 import { L2NativeSuperchainERC20Abi } from '@/abi/L2NativeSuperchainERC20Abi'
+import { chains, transports } from '@/config'
 import { envVars } from '@/envVars'
+import { useEffect } from 'react'
+import { createPublicClient } from 'viem'
+import { readContract } from 'viem/actions'
 import { useReadContracts } from 'wagmi'
 
-export const useTokenInfo = (address: `0x${string}`) => {
+export const useBalance = (address: `0x${string}`) => {
   const result = useReadContracts({
     contracts: [
       {
@@ -16,7 +20,7 @@ export const useTokenInfo = (address: `0x${string}`) => {
         functionName: 'balanceOf',
         args: [address],
       },
-    ],
+    ]
   })
 
   const result2 = useReadContracts({
@@ -32,10 +36,19 @@ export const useTokenInfo = (address: `0x${string}`) => {
         functionName: 'balanceOf',
         args: [address],
       },
-    ],
+    ]
   })
+  
   const [balance, totalSupply] = result.data || []
   const [balance_B, totalSupply_B] = result2.data || []
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      result.refetch()
+      result2.refetch()
+    }, 2000)
+    return () => clearInterval(id)
+  })
 
   return {
     totalSupply: totalSupply?.result,

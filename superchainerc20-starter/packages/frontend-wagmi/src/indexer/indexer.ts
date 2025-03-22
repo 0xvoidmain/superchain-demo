@@ -282,14 +282,14 @@ export const createIndexer = (
           useIndexerStore.getState().addTransfer(transfer)
         })
 
-        console.log(chainId, await client.getLogs({
-          address: envVars.VITE_POOL_CONTRACT_ADDRESS,
-          event: parseAbiItem(
-            'event ExecuteCrosschainSwap(uint256 sourceChainId, address tokenA, uint256 amountA, address tokenB, uint256 amountB, uint256 reserveA, uint256 reserveB, address recipient)',
-          ),
-          fromBlock: currentFromBlock,
-          toBlock: effectiveToBlock,
-        }))
+        // console.log(chainId, await client.getLogs({
+        //   address: envVars.VITE_POOL_CONTRACT_ADDRESS,
+        //   event: parseAbiItem(
+        //     'event ExecuteCrosschainSwap(uint256 sourceChainId, address tokenA, uint256 amountA, address tokenB, uint256 amountB, uint256 reserveA, uint256 reserveB, address recipient)',
+        //   ),
+        //   fromBlock: currentFromBlock,
+        //   toBlock: effectiveToBlock,
+        // }))
 
         currentFromBlock = effectiveToBlock + BigInt(1)
       }

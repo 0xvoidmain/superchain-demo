@@ -1,12 +1,10 @@
 import { createConfig, http } from 'wagmi'
-import {   } from '@eth-optimism/viem'
-import { optimismSepolia, sepolia } from 'wagmi/chains'
-import { metaMask, walletConnect } from 'wagmi/connectors'
+import { optimismSepolia } from 'wagmi/chains'
+import { metaMask } from 'wagmi/connectors'
 import { privateKeyToAccount } from 'viem/accounts'
-import { devAccount } from '@/connectors/devAccount'
-import { envVars } from '@/envVars'
 
 import { HttpTransport } from 'viem'
+import { devAccount } from './connectors/devAccount'
 
 const supersimL2A = {
   ...JSON.parse(
@@ -57,7 +55,7 @@ const supersimL2A = {
     },
   },
   id: 420120000,
-  name: 'interop-alpha-0',
+  name: 'L2-DEV ONE',
   sourceId: 11155111,
   rpcUrls: {
     default: {
@@ -115,7 +113,7 @@ const supersimL2B = {
     },
   },
   id: 420120001,
-  name: 'interop-alpha-1',
+  name: 'L2-DEV TWO ',
   sourceId: 11155111,
   rpcUrls: {
     default: {
@@ -128,13 +126,12 @@ export const chains = [supersimL2A, supersimL2B] as const
 
 export const transports = Object.fromEntries(
   chains.map((chain) => [chain.id, http()])
-  
 ) as Record<(typeof chains)[number]['id'], HttpTransport>
 
 // Default dev account (for testing)
 export const defaultDevAccount = privateKeyToAccount(
-  '0x97863b0e44341942e32b42751f751bbfcaa4c3da0223118af8ebb2e18383551a'
-  // '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
+//   '0x97863b0e44341942e32b42751f751bbfcaa4c3da0223118af8ebb2e18383551a'
+  '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
   // (prompt("Please enter your private key", '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80') || '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80') as any
 )
 
@@ -142,7 +139,7 @@ export const config = createConfig({
   chains,
   transports,
   connectors: [
-    // devAccount(defaultDevAccount),
+    devAccount(defaultDevAccount),
     metaMask()
   ],
 })

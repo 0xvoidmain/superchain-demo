@@ -1,34 +1,17 @@
-import { ArrowLeftRight as BridgeIcon, Droplet, RefreshCw } from 'lucide-react'
 import { Bridge } from '@/components/Bridge'
 import { Providers } from '@/Providers'
-import { WalletBalance } from '@/components/WalletBalance'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Faucet } from '@/components/Faucet'
 import { ConnectWalletButton } from '@/components/connect-wallet/ConnectWalletButton'
 import { TokenInfo } from '@/components/TokenInfo'
-import { TokenAggregateSupply } from '@/components/TokenAggregateSupply'
-import { useStartIndexer } from '@/hooks/useIndexer'
-import { Button } from '@/components/ui/button'
 import { RecentActivity } from '@/components/RecentActivity'
 import { Transfer } from './components/Transfer'
 import { Swap } from './components/Swap'
+import { NetworkButtons } from './components/NetworkButtons'
+import { TokenAggregateSupply } from './components/TokenAggregateSupply'
+import { WalletBalance } from './components/WalletBalance'
 import { PoolBalance } from './components/PoolBalance'
-
-const IndexerStarter = () => {
-  const indexer = useStartIndexer()
-  return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => indexer?.resetAllChains()}
-      className="flex items-center gap-2"
-    >
-      <RefreshCw className="h-4 w-4" />
-      Reset Indexer
-    </Button>
-  )
-}
 
 function App() {
   return (
@@ -38,7 +21,7 @@ function App() {
           <div className="container mx-auto flex h-16 items-center justify-between">
             <h1 className="text-xl font-bold">SuperchainERC20 Dev Tools</h1>
             <div className="flex items-center gap-4">
-              <IndexerStarter />
+              <NetworkButtons />
               <ConnectWalletButton />
             </div>
           </div>
@@ -58,7 +41,7 @@ function App() {
             {/* Left Column - Tools */}
             <div className="lg:col-span-2 space-y-6">
               <Card>
-                <Tabs defaultValue="swap" className="w-full">
+                <Tabs defaultValue="faucet" className="w-full">
                   <div className="px-6 pt-6">
                     <TabsList className="w-full flex">
                       <TabsTrigger value="faucet" className="flex-1">

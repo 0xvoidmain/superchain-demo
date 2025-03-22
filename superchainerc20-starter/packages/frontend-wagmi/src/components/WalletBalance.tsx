@@ -1,11 +1,12 @@
 import { Card } from '@/components/ui/card'
-import { formatUnits } from 'viem'
+import { formatUnits, zeroAddress } from 'viem'
 import { chains } from '@/config'
 import { useTokenInfo } from '@/hooks/useTokenInfo'
-import { useAccount } from 'wagmi'
-import { truncateDecimals } from '@/lib/truncateDecimals'
+import { useAccount, useChainId } from 'wagmi'
 import { Copy } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { truncateDecimals } from '@/lib/truncateDecimals'
+import { useBalanceAllChain } from '@/hooks/useBalanceAllChain'
 
 export const WalletBalance = () => {
   const { address } = useAccount()
@@ -23,8 +24,16 @@ export const WalletBalance = () => {
     })
   }
 
-  const balances = useIndexerStore((state) => state.balances)
-  const { symbol, symbol_B, decimals, address: tokenAddA, address_B: tokenAddB } = useTokenInfo()
+  const {
+    balance,
+    balance_B
+  } = useBalanceAllChain(chains[0].id, address || zeroAddress)
+
+  const {
+    balance: balance_2,
+    balance_B: balance_B_2
+  } = useBalanceAllChain(chains[1].id, address || zeroAddress)
+  const { symbol, symbol_B, decimals } = useTokenInfo()
 
   // Return early if no address is connected
   if (!address) {
@@ -36,32 +45,6 @@ export const WalletBalance = () => {
       </Card>
     )
   }
-
-  const chainBalances = chains.map((chain) => ({
-    chainId: chain.id,
-    chainName: chain.name,
-    symbol: symbol ?? 'TOKEN',
-    balance: balances.perChain[`${chain.id}-${tokenAddA}`]?.[address] ?? BigInt(0),
-    decimals: decimals ?? 18,
-    initials: chain.name
-      .split(' ')
-      .map((word: any) => word[0])
-      .join('')
-      .toUpperCase(),
-  }))
-
-  const chainBalances_B = chains.map((chain) => ({
-    chainId: chain.id,
-    chainName: chain.name,
-    symbol: symbol_B ?? 'TOKEN',
-    balance: balances.perChain[`${chain.id}-${tokenAddB}`]?.[address] ?? BigInt(0),
-    decimals: decimals ?? 18,
-    initials: chain.name
-      .split(' ')
-      .map((word: any) => word[0])
-      .join('')
-      .toUpperCase(),
-  }))
 
   return (
     <Card className="p-4">
@@ -82,69 +65,105 @@ export const WalletBalance = () => {
             )}
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <div className="text-sm font-medium text-muted-foreground">
+            Network: <span style={{color: 'black'}}>{
+              chains[0].name
+            }</span>
+          </div>
+        </div>
 
-        <div className="space-y-3">
-          {chainBalances.map((chain) => {
-            const balance = Number(formatUnits(chain.balance, chain.decimals))
-            
-            return (
-              <div key={chain.chainId} className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-xs font-medium">
-                    {chain.initials}
+        <div className="space-y-1">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="text-sm font-medium">
+                      {symbol}
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="text-sm font-medium">
-                          {chain.chainName}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-medium">
-                          {truncateDecimals(balance, 6)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {chain.symbol}
-                        </div>
-                      </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">
+                      {truncateDecimals(Number(formatUnits(balance, decimals || 18)), 4)}
+                    </div>
+                    {/* <div className="text-xs text-muted-foreground">
+                      {balanceA.symbol}
+                    </div> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="text-sm font-medium">
+                      {symbol_B}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">
+                      {truncateDecimals(Number(formatUnits(balance_B, decimals || 18)), 4)}
                     </div>
                   </div>
                 </div>
               </div>
-            )
-          })}
-          <br/>
-          {chainBalances_B.map((chain) => {
-            const balance = Number(formatUnits(chain.balance, chain.decimals))
-            
-            return (
-              <div key={chain.chainId} className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-xs font-medium">
-                    {chain.initials}
+            </div>
+          </div>
+        </div>
+        
+        <br/>
+        <div className="flex items-center gap-2">
+          <div className="text-sm font-medium text-muted-foreground">
+            Network: <span style={{color: 'black'}}>{
+              chains[1].name
+            }</span>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="text-sm font-medium">
+                      {symbol}
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="text-sm font-medium">
-                          {chain.chainName}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-medium">
-                          {truncateDecimals(balance, 6)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {chain.symbol}
-                        </div>
-                      </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">
+                      {truncateDecimals(Number(formatUnits(balance_2, decimals || 18)), 4)}
+                    </div>
+                    {/* <div className="text-xs text-muted-foreground">
+                      {balanceA.symbol}
+                    </div> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="text-sm font-medium">
+                      {symbol_B}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">
+                      {truncateDecimals(Number(formatUnits(balance_B_2, decimals || 18)), 4)}
                     </div>
                   </div>
                 </div>
               </div>
-            )
-          })}
+            </div>
+          </div>
         </div>
       </div>
     </Card>

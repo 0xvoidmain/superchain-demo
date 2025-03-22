@@ -1,127 +1,44 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { SelectSimple } from '@/components/ui/input_select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { config } from '@/config'
-import { useAccount } from 'wagmi'
+import { useAccount, useChainId, useSwitchChain, useWriteContract } from 'wagmi'
+import { chains } from '@/config'
 import {
-  Address,
-  Hash,
-  http,
   parseUnits,
-  formatUnits,
-  createTestClient,
-  walletActions,
 } from 'viem'
 import { useTokenInfo } from '@/hooks/useTokenInfo'
 import { L2NativeSuperchainERC20Abi } from '@/abi/L2NativeSuperchainERC20Abi'
-import { waitForTransactionReceipt } from '@wagmi/core'
-import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { CheckCircle2, AlertCircle } from 'lucide-react'
-import { toAccount } from 'viem/accounts'
-
-const drip = async (
-  recipient: Address,
-  chainId: number,
-  amount: string,
-  decimals: number = 18,
-  tokenAddress: Address
-) => {
-  const chain = config.chains.find((x) => x.id === chainId)
-  if (!chain) throw new Error(`Chain with id ${chainId} not found`)
-
-  const minterAccount = toAccount(recipient)
-
-  const client = createTestClient({
-    chain,
-    transport: http(),
-    mode: 'anvil',
-    pollingInterval: 1000,
-  }).extend(walletActions)
-
-  // await client.impersonateAccount({
-  //   address: recipient,
-  // })
-
-  const hash = await client.writeContract({
-    account: minterAccount,
-    address: tokenAddress,
-    abi: L2NativeSuperchainERC20Abi,
-    functionName: 'mintTo',
-    args: [recipient, parseUnits(amount, decimals)],
-  })
-
-  return hash
-}
-
-const dripToMany = async (
-  recipient: Address,
-  chainIds: number[],
-  amount: string,
-  decimals: number = 18,
-  tokenAddress: Address
-) => {
-  const txs = await Promise.all(
-    chainIds.map(async (chainId) => {
-      return {
-        hash: await drip(recipient, chainId, amount, decimals, tokenAddress),
-        chainId,
-      }
-    }),
-  )
-  return txs
-}
-
-const waitForManyTx = async (txs: { hash: Hash; chainId: number }[]) => {
-  return await Promise.all(
-    txs.map(async (tx) => {
-      return await waitForTransactionReceipt(config, {
-        hash: tx.hash,
-        chainId: tx.chainId as 901 | 902,
-        timeout: 10000,
-        pollingInterval: 1000,
-      })
-    }),
-  )
-}
-
-const useWaitForManyTx = (txs: { hash: Hash; chainId: number }[]) => {
-  //uses tanstack query
-  return useQuery({
-    queryKey: ['waitForManyTx', txs],
-    queryFn: () => waitForManyTx(txs),
-  })
-}
+import { AlertCircle } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 export const Faucet = () => {
   const account = useAccount()
+  const {
+    writeContractAsync,
+    isPending: isLoading,
+    isError
+  } = useWriteContract()
 
-  const [txs, setTxs] = useState<{ hash: Hash; chainId: number }[]>([])
+  const chainId = useChainId()
+  const [targetChainIdString, setTargetChain] = useState(chainId.toString())
 
-  const { data: receipts, isLoading, isError } = useWaitForManyTx(txs)
+  useEffect(() => {
+    setTargetChain(chainId.toString())
+  }, [chainId])
 
-  const { symbol, decimals = 18, address, address_B, symbol_B, SYMBOLS } = useTokenInfo()
+  const { symbol, decimals = 18, address, address_B, symbol_B } = useTokenInfo()
 
   const [recipient, setRecipient] = useState(account.address || '')
   const [selectToken, setSelectToken] = useState(address || '')
-  const [networks, setNetworks] = useState<string[]>(
-    config.chains.map((x) => x.id.toString()),
-  )
+  
   const [amount, setAmount] = useState<string>('1000')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleNetworkToggle = (networkId: string) => {
-    setNetworks((current) =>
-      current.includes(networkId)
-        ? current.filter((id) => id !== networkId)
-        : [...current, networkId],
-    )
-  }
+  const {switchChain} = useSwitchChain()
 
   return (
     <div className="space-y-6">
@@ -132,14 +49,41 @@ export const Faucet = () => {
       <div className="space-y-6">
         <div className="space-y-2">
           <Label>Select Token</Label>
-            <SelectSimple
-            value={selectToken}
-            onChange={(e) => setSelectToken(e.target.value as any)}
+            <Select
+              value={selectToken}
+              onValueChange={e => setSelectToken(e as any)}
             >
-
-              <option value={address}>{symbol} | {address}</option>
-              <option value={address_B}>{symbol_B} | {address_B}</option>
-            </SelectSimple>
+              <SelectTrigger>
+                <SelectValue placeholder="Select token" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={address}>{symbol} | {address}</SelectItem>
+                <SelectItem value={address_B}>{symbol_B} | {address_B}</SelectItem>
+              </SelectContent>
+            </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Network</Label>
+          <Select
+            onValueChange={e => {
+              setTargetChain(e)
+              switchChain({
+                chainId: Number(e),
+              })
+            }}
+            value={targetChainIdString}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select network" />
+            </SelectTrigger>
+            <SelectContent>
+              {chains.map((chain) => (
+                <SelectItem key={chain.id} value={chain.id.toString()}>
+                  {chain.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label>Recipient Address</Label>
@@ -160,44 +104,27 @@ export const Faucet = () => {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label>Select Networks</Label>
-          <div className="grid gap-4 pt-2">
-            {config.chains.map((chain) => (
-              <div key={chain.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={chain.id.toString()}
-                  checked={networks.includes(chain.id.toString())}
-                  onCheckedChange={() =>
-                    handleNetworkToggle(chain.id.toString())
-                  }
-                />
-                <Label htmlFor={chain.id.toString()} className="font-normal">
-                  {chain.name}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <Button
           className="w-full"
           size="lg"
           disabled={
-            !recipient || networks.length === 0 || isSubmitting || isLoading
+            !recipient || isSubmitting || isLoading
           }
           onClick={async () => {
             try {
               setIsSubmitting(true)
-              const txs = await dripToMany(
-                recipient as Address,
-                networks.map(Number),
-                amount,
-                decimals,
-                selectToken
-              )
-              setTxs(txs)
-            } finally {
+
+              writeContractAsync({
+                address: selectToken,
+                abi: L2NativeSuperchainERC20Abi,
+                functionName: 'mintTo',
+                args: [recipient as any, parseUnits(amount, decimals)],
+              })
+            } 
+            catch (error) {
+              console.error('Error sending transaction:', error)
+            }
+            finally {
               setIsSubmitting(false)
             }
           }}
@@ -223,21 +150,6 @@ export const Faucet = () => {
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>
               Error occurred while processing transactions
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {receipts && receipts.length > 0 && (
-          <Alert
-            variant="default"
-            className="border-green-500 bg-green-50 dark:bg-green-900/10"
-          >
-            <CheckCircle2 className="h-4 w-4" color="#22c55e" />
-            <AlertTitle className="text-green-500">Success!</AlertTitle>
-            <AlertDescription>
-              Successfully dripped{' '}
-              {formatUnits(parseUnits(amount, decimals), decimals)} {SYMBOLS[selectToken]}{' '}
-              tokens on {receipts.length} networks.
             </AlertDescription>
           </Alert>
         )}

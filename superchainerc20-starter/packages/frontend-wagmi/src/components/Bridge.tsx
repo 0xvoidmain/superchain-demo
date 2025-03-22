@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,14 +15,13 @@ import { parseUnits } from 'viem'
 import { contracts } from '@eth-optimism/viem'
 import {
   useAccount,
+  useChainId,
   useSimulateContract,
   useSwitchChain,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from 'wagmi'
-import { envVars } from '@/envVars'
 import { SuperchainTokenBridgeAbi } from '@/abi/SuperchainTokenBridgeAbi'
-import { SelectSimple } from './ui/input_select'
 
 export const Bridge = () => {
   const { address } = useAccount()
@@ -30,17 +29,23 @@ export const Bridge = () => {
   const [amount, setAmount] = useState('')
   const [selectToken, setSelectToken] = useState<any>(address_A || '')
   const amountUnits = parseUnits(amount, decimals)
-  const [sourceChainIdString, setSourceChain] = useState(
-    chains[0].id.toString(),
-  )
+  const chainId = useChainId()
+  const [sourceChainIdString, setSourceChain] = useState(chainId?.toString())
   const sourceChainId = parseInt(sourceChainIdString)
   const [targetChainIdString, setTargetChain] = useState(
-    chains[1].id.toString(),
+    chains.find((chain) => chain.id !== sourceChainId)?.id.toString(),
   )
   const targetChainId = parseInt(targetChainIdString)
 
   const sourceChain = chains.find((chain) => chain.id === sourceChainId)
   const targetChain = chains.find((chain) => chain.id === targetChainId)
+
+  useEffect(() => {
+    setSourceChain(chainId.toString())
+    setTargetChain(
+      chains.find((chain) => chain.id !== chainId)?.id.toString() || '',
+    )
+  }, [chainId])
 
   const { switchChain } = useSwitchChain()
 
@@ -106,16 +111,21 @@ export const Bridge = () => {
 
       <div className="space-y-6">
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Select Token</Label>
-            <SelectSimple
+        <div className="space-y-2">
+          <Label>Select Token</Label>
+            <Select
               value={selectToken}
-              onChange={(e) => setSelectToken(e.target.value as any)}
-              >
-                <option value={address_A}>{symbol} | {address_A}</option>
-                <option value={address_B}>{symbol_B} | {address_B}</option>
-              </SelectSimple>
-          </div>
+              onValueChange={e => setSelectToken(e as any)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select token" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={address_A}>{symbol} | {address_A}</SelectItem>
+                <SelectItem value={address_B}>{symbol_B} | {address_B}</SelectItem>
+              </SelectContent>
+            </Select>
+        </div>
           <div className="space-y-2">
             <Label>Amount of {SYMBOLS[selectToken]}</Label>
             <Input
