@@ -139,7 +139,7 @@ export const config = createConfig({
   chains,
   transports,
   connectors: [
-    devAccount(defaultDevAccount),
+    // devAccount(defaultDevAccount),
     metaMask()
   ],
 })

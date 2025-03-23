@@ -25,15 +25,6 @@ export const TokenAggregateSupply = () => {
   const { symbol, symbol_B, decimals } = useTokenInfo()
 
   // Return early if no address is connected
-  if (!address) {
-    return (
-      <Card className="p-4">
-        <div className="text-sm text-muted-foreground">
-          Connect your wallet to view balances
-        </div>
-      </Card>
-    )
-  }
 
   return (
     <Card className="p-4">

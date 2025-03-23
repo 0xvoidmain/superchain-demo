@@ -12,6 +12,7 @@ import { NetworkButtons } from './components/NetworkButtons'
 import { TokenAggregateSupply } from './components/TokenAggregateSupply'
 import { WalletBalance } from './components/WalletBalance'
 import { PoolBalance } from './components/PoolBalance'
+import { Button } from './components/ui/button'
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
         <header className="border-b">
           <div className="container mx-auto flex h-16 items-center justify-between">
-            <h1 className="text-xl font-bold">SuperchainERC20 Dev Tools</h1>
+            <h1 className="text-xl font-bold">A8 Superchain-interop CrossSwap | DEMO</h1>
             <div className="flex items-center gap-4">
               <NetworkButtons />
               <ConnectWalletButton />
@@ -90,7 +91,32 @@ function App() {
             </div>
 
             <div className="space-y-6">
-              <RecentActivity />
+              {/* <RecentActivity /> */}
+              <Card className="p-6">
+                <div>
+                  <b>OPTIMISM INTEROP ECOSYSTEM</b>
+                </div>
+                <br/>
+                <Button>
+                  <a href='https://interop-devnet.superbridge.app/' target='__blank'>
+                    Bridge ETH from Sepolia to L2-DEV ONE / L2-DEV TWO
+                  </a>
+                </Button>
+                <br/>
+                <br/>
+                <Button>
+                  <a href='https://console.optimism.io/faucet' target='__blank'>
+                    Superchain Faucet
+                  </a>
+                </Button>
+                <br/>
+                <br/>
+                <Button>
+                  <a href='https://docs.optimism.io/stack/interop/tools/devnet' target='__blank'>
+                    Interop devnet documentation
+                  </a>
+                </Button>
+              </Card>
             </div>
           </div>
         </main>
