@@ -1,0 +1,23 @@
+[rpc_endpoints]
+op_chain_a = "https://interop-alpha-0.optimism.io"
+op_chain_b = "https://interop-alpha-1.optimism.io"
+
+[profile.default]
+src = "src"
+script = "scripts"
+out = "out"
+libs = ["lib"]
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+
+fs_permissions = [
+  { access='read', path='./configs' },
+  { access='read', path='./test' },
+  { access='write', path='./deployment.json' }
+]
+
+remappings = [
+  "@interop-lib/=lib/interop-lib/src/",
+  "@solady/=lib/solady/src/",
+  "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"
+]
